@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Machine Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Virtual Machine Manager</h1>
+
+    <!-- Settings Section -->
+    <div class="container">
+        <h2>VM Settings</h2>
+        <label for="diskSize">Disk Size (GB):</label>
+        <input type="number" id="diskSize" name="diskSize" min="1" max="5000" value="20"><br>
+
+        <label for="ramSize">RAM Size (GB):</label>
+        <input type="number" id="ramSize" name="ramSize" min="1" max="128" value="4"><br>
+
+        <label for="isoFile">Upload ISO File:</label>
+        <input type="file" id="isoFile" name="isoFile" accept=".iso"><br>
+
+        <label for="uefiBoot">Enable UEFI Boot:</label>
+        <input type="checkbox" id="uefiBoot" name="uefiBoot"><br>
+    </div>
+
+    <!-- Buttons for controlling VM -->
+    <button class="button" id="startVM">Start VM</button>
+    <button class="button" id="stopVM">Stop VM</button>
+    <button class="button" id="statusVM">Check VM Status</button>
+    
+    <div id="vmStatus"></div>
+
+    <script>
+        // Function to call the API and manage VM states
+        async function manageVM(action) {
+            const diskSize = document.getElementById('diskSize').value;
+            const ramSize = document.getElementById('ramSize').value;
+            const isoFile = document.getElementById('isoFile').files[0];
+            const uefiBoot = document.getElementById('uefiBoot').checked;
+
+            const formData = new FormData();
+            formData.append("diskSize", diskSize);
+            formData.append("ramSize", ramSize);
+            formData.append("uefiBoot", uefiBoot);
+            if (isoFile) {
+                formData.append("isoFile", isoFile);
+            }
+
+            const response = await fetch(`/vm/${action}`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            document.getElementById('vmStatus').innerText = `VM Status: ${data.status}`;
+        }
+
+        document.getElementById('startVM').addEventListener('click', () => manageVM('start'));
+        document.getElementById('stopVM').addEventListener('click', () => manageVM('stop'));
+        document.getElementById('statusVM').addEventListener('click', () => manageVM('status'));
+    </script>
+</body>
+</html>
