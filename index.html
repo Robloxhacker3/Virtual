@@ -15,8 +15,11 @@
             margin: 5px;
             cursor: pointer;
         }
-        .container {
-            margin-bottom: 20px;
+        #vncFrame {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ccc;
+            display: none;
         }
     </style>
 </head>
@@ -43,11 +46,13 @@
     <button class="button" id="startVM">Start VM</button>
     <button class="button" id="stopVM">Stop VM</button>
     <button class="button" id="statusVM">Check VM Status</button>
-    
+
+    <!-- VNC Frame to display VM -->
+    <iframe id="vncFrame" src="noVNC/vnc.html?host=localhost&port=5901"></iframe>
+
     <div id="vmStatus"></div>
 
     <script>
-        // Function to call the API and manage VM states
         async function manageVM(action) {
             const diskSize = document.getElementById('diskSize').value;
             const ramSize = document.getElementById('ramSize').value;
@@ -69,6 +74,11 @@
 
             const data = await response.json();
             document.getElementById('vmStatus').innerText = `VM Status: ${data.status}`;
+
+            if (action === 'start') {
+                // Show the VNC frame after starting the VM
+                document.getElementById('vncFrame').style.display = 'block';
+            }
         }
 
         document.getElementById('startVM').addEventListener('click', () => manageVM('start'));
